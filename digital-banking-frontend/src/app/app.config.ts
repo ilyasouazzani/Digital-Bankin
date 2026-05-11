@@ -1,12 +1,9 @@
-import { ApplicationConfig } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { provideRouter, withHashLocation } from '@angular/router';
 import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { Chart, registerables } from 'chart.js';
 import { routes } from './app.routes';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
-
-Chart.register(...registerables);
 
 export const appConfig: ApplicationConfig = {
   providers: [

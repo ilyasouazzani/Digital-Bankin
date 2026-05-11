@@ -12,16 +12,19 @@ import { AccountHistory, BankAccount } from '../../models/bank-account.model';
   templateUrl: './accounts.component.html'
 })
 export class AccountsComponent implements OnInit {
-  accounts: BankAccount[] = [];
+  accounts: BankAccount[]       = [];
   selectedAccount: BankAccount | null = null;
   accountHistory: AccountHistory | null = null;
-  loading = false;
+  loading        = false;
   historyLoading = false;
-  currentPage = 0;
-  pageSize = 5;
+  currentPage    = 0;
+  pageSize       = 5;
   customerId: number | null = null;
 
-  constructor(private bankAccountService: BankAccountService, private route: ActivatedRoute) {}
+  constructor(
+    private bankAccountService: BankAccountService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -35,25 +38,27 @@ export class AccountsComponent implements OnInit {
     const obs = this.customerId
       ? this.bankAccountService.getCustomerAccounts(this.customerId)
       : this.bankAccountService.getAllAccounts();
+
     obs.subscribe({
       next: data => { this.accounts = data; this.loading = false; },
-      error: () => this.loading = false
+      error: ()   => { this.loading = false; }
     });
   }
 
   selectAccount(account: BankAccount): void {
     this.selectedAccount = account;
-    this.currentPage = 0;
+    this.currentPage     = 0;
     this.loadHistory();
   }
 
   loadHistory(): void {
     if (!this.selectedAccount) return;
     this.historyLoading = true;
-    this.bankAccountService.getAccountHistory(this.selectedAccount.id, this.currentPage, this.pageSize)
+    this.bankAccountService
+      .getAccountHistory(this.selectedAccount.id, this.currentPage, this.pageSize)
       .subscribe({
         next: data => { this.accountHistory = data; this.historyLoading = false; },
-        error: () => this.historyLoading = false
+        error: ()   => { this.historyLoading = false; }
       });
   }
 
@@ -64,11 +69,11 @@ export class AccountsComponent implements OnInit {
     return Array.from({ length: this.accountHistory.totalPages }, (_, i) => i);
   }
 
-  getAccountTypeLabel(type: string): string {
+  typeLabel(type: string): string {
     return type === 'CurrentAccount' ? 'Compte Courant' : 'Compte Épargne';
   }
 
-  getAccountTypeBadge(type: string): string {
+  typeBadge(type: string): string {
     return type === 'CurrentAccount' ? 'bg-primary' : 'bg-success';
   }
 }

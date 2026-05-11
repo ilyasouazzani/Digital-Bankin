@@ -1,10 +1,13 @@
 import { Component, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+import { ChatbotService } from '../../services/chatbot.service';
 
-interface Message { role: 'user' | 'assistant'; content: string; timestamp: Date; }
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
 
 @Component({
   selector: 'app-chatbot',
@@ -15,14 +18,16 @@ interface Message { role: 'user' | 'assistant'; content: string; timestamp: Date
 export class ChatbotComponent implements AfterViewChecked {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
-  messages: Message[] = [
-    { role: 'assistant', content: 'Bonjour ! Je suis votre assistant bancaire IA. Je peux vous aider à consulter vos soldes, votre historique de transactions, ou répondre à vos questions bancaires. Comment puis-je vous aider ?', timestamp: new Date() }
-  ];
-  userInput = '';
-  loading = false;
-  private apiUrl = `${environment.apiUrl}/chatbot/chat`;
+  messages: Message[] = [{
+    role: 'assistant',
+    content: 'Bonjour ! Je suis votre assistant bancaire IA. Je peux vous aider à consulter des informations sur vos comptes, comprendre les types de produits disponibles, ou répondre à vos questions bancaires. Comment puis-je vous aider ?',
+    timestamp: new Date()
+  }];
 
-  constructor(private http: HttpClient) {}
+  userInput = '';
+  loading   = false;
+
+  constructor(private chatbotService: ChatbotService) {}
 
   ngAfterViewChecked(): void { this.scrollToBottom(); }
 
@@ -32,9 +37,9 @@ export class ChatbotComponent implements AfterViewChecked {
 
     this.messages.push({ role: 'user', content, timestamp: new Date() });
     this.userInput = '';
-    this.loading = true;
+    this.loading   = true;
 
-    this.http.post<{ response: string }>(this.apiUrl, { message: content }).subscribe({
+    this.chatbotService.sendMessage(content).subscribe({
       next: res => {
         this.messages.push({ role: 'assistant', content: res.response, timestamp: new Date() });
         this.loading = false;
@@ -42,7 +47,7 @@ export class ChatbotComponent implements AfterViewChecked {
       error: () => {
         this.messages.push({
           role: 'assistant',
-          content: 'Désolé, je rencontre une difficulté technique. Veuillez réessayer dans un moment.',
+          content: 'Je suis temporairement indisponible. Veuillez vérifier que le backend est démarré et que la clé OPENAI_API_KEY est configurée.',
           timestamp: new Date()
         });
         this.loading = false;
@@ -51,15 +56,21 @@ export class ChatbotComponent implements AfterViewChecked {
   }
 
   onKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); this.sendMessage(); }
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendMessage();
+    }
   }
 
   clearChat(): void {
+    this.chatbotService.clearHistory().subscribe();
     this.messages = [this.messages[0]];
   }
 
   private scrollToBottom(): void {
-    try { this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight; }
-    catch {}
+    try {
+      this.messagesContainer.nativeElement.scrollTop =
+        this.messagesContainer.nativeElement.scrollHeight;
+    } catch {}
   }
 }
