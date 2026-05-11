@@ -1,0 +1,61 @@
+<div class="container-fluid py-4">
+  <h2 class="fw-bold mb-4"><i class="bi bi-speedometer2 me-2 text-primary"></i>Tableau de Bord</h2>
+
+  <!-- KPI Cards -->
+  <div class="row g-3 mb-5">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm text-white bg-primary">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div><div class="fs-5 fw-bold">{{ totalCustomers }}</div><div class="small opacity-75">Clients</div></div>
+          <i class="bi bi-people-fill fs-1 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm text-white bg-success">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div><div class="fs-5 fw-bold">{{ totalAccounts }}</div><div class="small opacity-75">Comptes</div></div>
+          <i class="bi bi-wallet2 fs-1 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm text-white bg-info">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div><div class="fs-5 fw-bold">{{ totalBalance | number:'1.0-0' }} €</div><div class="small opacity-75">Solde total</div></div>
+          <i class="bi bi-currency-euro fs-1 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm text-white bg-warning">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div><div class="fs-5 fw-bold">{{ currentAccountsCount }} / {{ savingAccountsCount }}</div><div class="small opacity-75">Courants / Épargne</div></div>
+          <i class="bi bi-bar-chart-fill fs-1 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-bold">Répartition des types de comptes</div>
+        <div class="card-body"><canvas baseChart [data]="accountTypeChartData" [type]="accountTypeChartType" [options]="accountTypeChartOptions"></canvas></div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-bold">Distribution des soldes</div>
+        <div class="card-body"><canvas baseChart [data]="balanceDistChartData" [type]="balanceDistChartType" [options]="balanceDistChartOptions"></canvas></div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-bold">Solde total par client (€)</div>
+        <div class="card-body"><canvas baseChart [data]="balanceChartData" [type]="balanceChartType" [options]="balanceChartOptions"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
