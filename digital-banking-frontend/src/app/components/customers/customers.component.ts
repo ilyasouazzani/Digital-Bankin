@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { CustomerService } from '../../services/customer.service';
 import { Customer } from '../../models/customer.model';
 
 @Component({
   selector: 'app-customers',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule],
   templateUrl: './customers.component.html'
 })
 export class CustomersComponent implements OnInit {
@@ -49,6 +50,7 @@ export class CustomersComponent implements OnInit {
     this.selectedCustomer = null;
     this.initForm();
     this.showModal = true;
+    this.errorMessage = '';
   }
 
   openEditModal(customer: Customer): void {
@@ -56,33 +58,53 @@ export class CustomersComponent implements OnInit {
     this.selectedCustomer = customer;
     this.initForm(customer);
     this.showModal = true;
+    this.errorMessage = '';
   }
 
-  closeModal(): void { this.showModal = false; this.errorMessage = ''; }
+  closeModal(): void {
+    this.showModal = false;
+    this.errorMessage = '';
+  }
 
   onSubmit(): void {
     if (this.customerForm.invalid) return;
     const data: Customer = this.customerForm.value;
     if (this.editMode && this.selectedCustomer?.id) {
       this.customerService.updateCustomer(this.selectedCustomer.id, data).subscribe({
-        next: () => { this.successMessage = 'Client mis à jour !'; this.closeModal(); this.loadCustomers(); },
-        error: () => this.errorMessage = 'Erreur mise à jour.'
+        next: () => {
+          this.successMessage = 'Client mis à jour avec succès !';
+          this.closeModal();
+          this.loadCustomers();
+          setTimeout(() => this.successMessage = '', 3000);
+        },
+        error: err => this.errorMessage = err.error?.message || 'Erreur lors de la mise à jour.'
       });
     } else {
       this.customerService.createCustomer(data).subscribe({
-        next: () => { this.successMessage = 'Client créé !'; this.closeModal(); this.loadCustomers(); },
-        error: () => this.errorMessage = 'Erreur création.'
+        next: () => {
+          this.successMessage = 'Client créé avec succès !';
+          this.closeModal();
+          this.loadCustomers();
+          setTimeout(() => this.successMessage = '', 3000);
+        },
+        error: err => this.errorMessage = err.error?.message || 'Erreur lors de la création.'
       });
     }
   }
 
   deleteCustomer(id: number): void {
-    if (!confirm('Supprimer ce client ?')) return;
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) return;
     this.customerService.deleteCustomer(id).subscribe({
-      next: () => { this.successMessage = 'Client supprimé !'; this.loadCustomers(); },
-      error: () => this.errorMessage = 'Erreur suppression.'
+      next: () => {
+        this.successMessage = 'Client supprimé avec succès !';
+        this.loadCustomers();
+        setTimeout(() => this.successMessage = '', 3000);
+      },
+      error: err => this.errorMessage = err.error?.message || 'Erreur lors de la suppression.'
     });
   }
 
-  onSearch(): void { this.loadCustomers(); }
+  onSearch(): void {
+    this.loadCustomers();
+  }
 }
