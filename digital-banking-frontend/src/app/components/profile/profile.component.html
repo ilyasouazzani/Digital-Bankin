@@ -1,0 +1,87 @@
+<div class="container py-4" style="max-width: 700px;">
+  <h2 class="fw-bold mb-4"><i class="bi bi-person-circle me-2 text-primary"></i>Mon Profil</h2>
+
+  @if (successMessage) {
+    <div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger"><i class="bi bi-x-circle me-2"></i>{{ errorMessage }}</div>
+  }
+
+  <!-- Informations profil -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-primary text-white fw-bold">
+      <i class="bi bi-person me-2"></i>Informations du compte
+    </div>
+    <div class="card-body">
+      @if (loadingProfile) {
+        <div class="text-center py-3"><div class="spinner-border text-primary"></div></div>
+      } @else if (profile) {
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <label class="form-label text-muted small fw-semibold">NOM D'UTILISATEUR</label>
+            <div class="fw-bold fs-5">{{ profile.username }}</div>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label text-muted small fw-semibold">EMAIL</label>
+            <div>{{ profile.email || '—' }}</div>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label text-muted small fw-semibold">RÔLES</label>
+            <div>
+              @for (role of profile.roles; track role) {
+                <span class="badge bg-primary me-1">{{ role }}</span>
+              }
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label text-muted small fw-semibold">STATUT</label>
+            <div>
+              <span class="badge {{ profile.active ? 'bg-success' : 'bg-danger' }}">
+                <i class="bi bi-{{ profile.active ? 'check-circle' : 'x-circle' }} me-1"></i>
+                {{ profile.active ? 'Actif' : 'Inactif' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Changement de mot de passe -->
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-white fw-bold border-bottom">
+      <i class="bi bi-shield-lock me-2 text-warning"></i>Changer le mot de passe
+    </div>
+    <div class="card-body">
+      <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()">
+        <div class="mb-3">
+          <label class="form-label fw-semibold small">Mot de passe actuel</label>
+          <input type="password" class="form-control"
+                 [class.is-invalid]="passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched"
+                 formControlName="oldPassword">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold small">Nouveau mot de passe</label>
+          <input type="password" class="form-control"
+                 [class.is-invalid]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched"
+                 formControlName="newPassword">
+          <div class="form-text">Minimum 6 caractères</div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label fw-semibold small">Confirmer le nouveau mot de passe</label>
+          <input type="password" class="form-control"
+                 [class.is-invalid]="passwordForm.errors?.['mismatch'] && passwordForm.get('confirmPassword')?.touched"
+                 formControlName="confirmPassword">
+          @if (passwordForm.errors?.['mismatch'] && passwordForm.get('confirmPassword')?.touched) {
+            <div class="text-danger small mt-1">Les mots de passe ne correspondent pas</div>
+          }
+        </div>
+        <button type="submit" class="btn btn-warning fw-bold" [disabled]="passwordForm.invalid || loadingPassword">
+          @if (loadingPassword) { <span class="spinner-border spinner-border-sm me-2"></span> }
+          <i class="bi bi-shield-check me-1"></i>Modifier le mot de passe
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
