@@ -1,0 +1,61 @@
+<div class="container py-4" style="max-width: 640px;">
+  <h2 class="fw-bold mb-4"><i class="bi bi-arrow-left-right me-2 text-primary"></i>Opérations Bancaires</h2>
+
+  @if (successMessage) {
+    <div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger"><i class="bi bi-x-circle me-2"></i>{{ errorMessage }}</div>
+  }
+
+  <!-- Sélection du type -->
+  <div class="btn-group w-100 mb-4" role="group">
+    <button type="button" class="btn {{ operationType==='CREDIT' ? 'btn-success' : 'btn-outline-success' }}"
+            (click)="setType('CREDIT')"><i class="bi bi-plus-circle me-1"></i>Versement</button>
+    <button type="button" class="btn {{ operationType==='DEBIT' ? 'btn-danger' : 'btn-outline-danger' }}"
+            (click)="setType('DEBIT')"><i class="bi bi-dash-circle me-1"></i>Retrait</button>
+    <button type="button" class="btn {{ operationType==='TRANSFER' ? 'btn-primary' : 'btn-outline-primary' }}"
+            (click)="setType('TRANSFER')"><i class="bi bi-arrow-left-right me-1"></i>Virement</button>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-4">
+      <form [formGroup]="operationForm" (ngSubmit)="onSubmit()">
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Compte source</label>
+          <input type="text" class="form-control font-monospace" formControlName="accountId"
+                 placeholder="UUID du compte">
+        </div>
+
+        @if (operationType === 'TRANSFER') {
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Compte destination</label>
+            <input type="text" class="form-control font-monospace" formControlName="accountDestination"
+                   placeholder="UUID du compte destination">
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Montant (€)</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-currency-euro"></i></span>
+            <input type="number" class="form-control" formControlName="amount" placeholder="0.00" min="1" step="0.01">
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Description</label>
+          <input type="text" class="form-control" formControlName="description" placeholder="Motif de l'opération">
+        </div>
+
+        <button type="submit" class="btn w-100 py-2 fw-bold
+          {{ operationType==='CREDIT' ? 'btn-success' : operationType==='DEBIT' ? 'btn-danger' : 'btn-primary' }}"
+          [disabled]="operationForm.invalid || loading">
+          @if (loading) { <span class="spinner-border spinner-border-sm me-2"></span> }
+          <i class="bi bi-send me-1"></i>Valider l'opération
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
