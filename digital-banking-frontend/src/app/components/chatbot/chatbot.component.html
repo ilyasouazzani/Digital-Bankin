@@ -1,0 +1,91 @@
+<div class="container-fluid py-4">
+  <h2 class="fw-bold mb-4"><i class="bi bi-robot me-2 text-primary"></i>Assistant Bancaire IA</h2>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm" style="height: 75vh; display: flex; flex-direction: column;">
+
+        <!-- Header -->
+        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            <div class="bg-white rounded-circle p-1 me-2">
+              <i class="bi bi-robot text-primary fs-5"></i>
+            </div>
+            <div>
+              <div class="fw-bold">Assistant Digital Banking</div>
+              <div class="small opacity-75"><span class="badge bg-success me-1" style="font-size:.6rem;">●</span>En ligne</div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-outline-light" (click)="clearChat()">
+            <i class="bi bi-trash me-1"></i>Vider
+          </button>
+        </div>
+
+        <!-- Messages -->
+        <div class="card-body overflow-auto p-4 flex-grow-1" #messagesContainer>
+          @for (msg of messages; track $index) {
+            <div class="d-flex mb-3 {{ msg.role === 'user' ? 'justify-content-end' : 'justify-content-start' }}">
+              @if (msg.role === 'assistant') {
+                <div class="bg-light rounded-circle p-2 me-2 align-self-end" style="min-width:36px; height:36px;">
+                  <i class="bi bi-robot text-primary"></i>
+                </div>
+              }
+              <div class="rounded-3 px-3 py-2 shadow-sm"
+                   style="max-width:75%; white-space: pre-wrap;"
+                   [class]="msg.role === 'user' ? 'bg-primary text-white' : 'bg-white border'">
+                {{ msg.content }}
+                <div class="text-end mt-1" style="font-size:.65rem; opacity:.6;">
+                  {{ msg.timestamp | date:'HH:mm' }}
+                </div>
+              </div>
+              @if (msg.role === 'user') {
+                <div class="bg-primary rounded-circle p-2 ms-2 align-self-end text-white" style="min-width:36px; height:36px;">
+                  <i class="bi bi-person"></i>
+                </div>
+              }
+            </div>
+          }
+
+          @if (loading) {
+            <div class="d-flex justify-content-start mb-3">
+              <div class="bg-light rounded-circle p-2 me-2" style="min-width:36px; height:36px;">
+                <i class="bi bi-robot text-primary"></i>
+              </div>
+              <div class="bg-white border rounded-3 px-3 py-2 shadow-sm">
+                <div class="d-flex gap-1 align-items-center" style="height:24px;">
+                  <span class="dot-flashing"></span>
+                  <span class="dot-flashing" style="animation-delay:.2s"></span>
+                  <span class="dot-flashing" style="animation-delay:.4s"></span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Input -->
+        <div class="card-footer bg-white border-top p-3">
+          <div class="input-group">
+            <textarea class="form-control" rows="1" [(ngModel)]="userInput"
+                      placeholder="Posez votre question bancaire..." (keydown)="onKeydown($event)"
+                      style="resize:none; max-height:100px;"></textarea>
+            <button class="btn btn-primary px-3" (click)="sendMessage()" [disabled]="loading || !userInput.trim()">
+              <i class="bi bi-send-fill"></i>
+            </button>
+          </div>
+          <div class="text-muted small mt-1">Entrée pour envoyer • Shift+Entrée pour saut de ligne</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.dot-flashing {
+  width: 8px; height: 8px; border-radius: 50%;
+  background-color: #0d6efd; display: inline-block;
+  animation: dot-flashing 1s infinite linear alternate;
+}
+@keyframes dot-flashing {
+  0% { opacity: 1; } 100% { opacity: 0.2; }
+}
+</style>
